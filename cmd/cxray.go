@@ -1,26 +1,50 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/mrtc0/cxray/logger"
-	"github.com/mrtc0/cxray/tracer"
+	tracer "github.com/mrtc0/cxray/pkg/tracer"
+	"github.com/mrtc0/cxray/pkg/tracer/execve"
 	"gopkg.in/urfave/cli.v1"
-)
-
-var (
-	uid     []uint32
-	runtime []string
 )
 
 func main() {
 	app := cli.NewApp()
 
 	app.Action = func(c *cli.Context) error {
-		logger := logger.New()
-		bpftracer := tracer.Tracer{Logger: logger}
-		bpftracer.Trace()
+		sig := make(chan os.Signal, 1)
+
+		signal.Notify(sig, os.Interrupt)
+		signal.Notify(sig, syscall.SIGTERM)
+
+		tracer.Init()
+		tracer.Tracers = map[string]tracer.Tracer{"execve": execve.Init()}
+		for _, t := range tracer.Tracers {
+			err := t.Load()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			go func(t tracer.Tracer) {
+				for {
+					err := t.Watch()
+					if err != nil {
+						fmt.Println(err)
+					}
+				}
+			}(t)
+
+			t.Start()
+		}
+
+		<-sig
+		for _, t := range tracer.Tracers {
+			t.Stop()
+		}
 		return nil
 	}
 	err := app.Run(os.Args)
