@@ -137,7 +137,7 @@ const (
 
 // execveEvent is saved a execve event (perfmap)
 type execveEvent struct {
-	// Pid for process
+	// PID for process
 	PID uint32
 	// UID for process
 	UID uint32
