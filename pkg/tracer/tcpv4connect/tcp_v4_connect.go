@@ -1,4 +1,4 @@
-package tcp_v4_connect
+package tcpv4connect
 
 import (
 	"bytes"
@@ -130,6 +130,7 @@ type tcpV4ConnectTracer struct {
 	logger  *logger.Logger
 }
 
+// Init is initialize tcpV4ConnectTracer
 func Init() tracer.Tracer {
 	return &tcpV4ConnectTracer{
 		channel: make(chan []byte),
