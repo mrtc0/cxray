@@ -33,6 +33,8 @@ Linux 5af89d05295b 5.0.0-37-generic #40~18.04.1-Ubuntu SMP Thu Nov 14 12:06:39 U
 / # cat /etc/passwd
 root:x:0:0:root:/root:/bin/ash
 ...
+/ # curl https://example.com/
+...
 
 $ cat log.json
 {"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"","comm":"","pid":"12555","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:36Z"}
@@ -40,6 +42,7 @@ $ cat log.json
 {"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"-a","comm":"/bin/uname","pid":"12608","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:39Z"}
 {"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"/etc/passwd","comm":"/bin/cat","pid":"12609","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:41Z"}
 {"data":{"container_id":"5af89d052","event":{"syscall":"open","data":{"comm":"cat","fname":"/etc/passwd","pid":"14134","ret":"3","uid":"0"}}},"level":"info","msg":"open","time":"2019-12-25T02:02:27Z"}
+{"data":{"container_id":"5af89d052","event":{"syscall":"tcp_v4_connect","data":{"comm":"curl","daddr":"93.184.216.34","dport":"443","pid":"17408","ret":"0","saddr":"172.17.0.2","uid":"0"}}},"level":"info","msg":"tcp_v4_connect","time":"2019-12-25T16:12:01Z"}
 ```
 
 # Support
@@ -49,5 +52,5 @@ $ cat log.json
  * [x] Changes to protected configuration files and binaries
  * [ ] Writes to unexpected locations and file types
  * [ ] Creation of unexpected network listeners
- * [ ] Traffic sent to unexpected network destinations
+ * [x] Traffic sent to unexpected network destinations
  * [ ] Malware storage or execution

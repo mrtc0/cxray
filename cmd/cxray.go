@@ -10,6 +10,7 @@ import (
 	tracer "github.com/mrtc0/cxray/pkg/tracer"
 	"github.com/mrtc0/cxray/pkg/tracer/execve"
 	"github.com/mrtc0/cxray/pkg/tracer/open"
+	"github.com/mrtc0/cxray/pkg/tracer/tcp_v4_connect"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -24,8 +25,9 @@ func main() {
 
 		tracer.Init()
 		tracer.Tracers = map[string]tracer.Tracer{
-			"execve": execve.Init(),
-			"open":   open.Init(),
+			"execve":         execve.Init(),
+			"open":           open.Init(),
+			"tcp_v4_connect": tcp_v4_connect.Init(),
 		}
 
 		for _, t := range tracer.Tracers {
