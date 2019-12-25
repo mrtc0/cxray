@@ -24,57 +24,21 @@ const (
 #include <linux/utsname.h>
 #include <linux/pid_namespace.h>
 
-struct val_t {
-    u32 pid;
-    char comm[TASK_COMM_LEN];
-    const char *fname;
-		char container_id [9];
-    int flags; // EXTENDED_STRUCT_MEMBER
-};
-
 struct data_t {
     u32 pid;
     u32 uid;
 		int ret;
 		char comm[TASK_COMM_LEN];
-    char fname[NAME_MAX];
+    char fname[70];
 		char container_id [9];
     u32 flags; // EXTENDED_STRUCT_MEMBER
 };
 
-BPF_HASH(infotmp, u32, struct val_t);
-BPF_PERF_OUTPUT(events);
+BPF_HASH(infotmp, u32, struct data_t);
+BPF_PERF_OUTPUT(open_events);
 
 int trace_entry(struct pt_regs *ctx, int dfd, const char __user *filename, int flags, umode_t mode)
 {
-    struct val_t val = {};
-		struct task_struct *task;
-
-		task = (struct task_struct *)bpf_get_current_task();
-		struct pid_namespace *pns = (struct pid_namespace *)task->nsproxy->pid_ns_for_children;
-
-		// 0xEFFFFFFCU is initial host namespace id
-		if (pns->ns.inum == 0xEFFFFFFCU) {
-			return 0;
-		}
-
-		struct uts_namespace *uns = (struct uts_namespace *)task->nsproxy->uts_ns;
-		bpf_probe_read(&val.container_id, sizeof(val.container_id), (void *)uns->name.nodename);
-
-    u32 pid = bpf_get_current_pid_tgid() >> 32;
-    u32 uid = bpf_get_current_uid_gid();
-    if (bpf_get_current_comm(&val.comm, sizeof(val.comm)) == 0) {
-        val.pid = pid;
-        val.fname = filename;
-        val.flags = flags; // EXTENDED_STRUCT_MEMBER
-        infotmp.update(&pid, &val);
-    }
-    return 0;
-}
-
-int trace_return(struct pt_regs *ctx)
-{
-    struct val_t *valp;
     struct data_t data = {};
 		struct task_struct *task;
 
@@ -86,24 +50,44 @@ int trace_return(struct pt_regs *ctx)
 			return 0;
 		}
 
-    u32 pid = bpf_get_current_pid_tgid() >> 32;
-    valp = infotmp.lookup(&pid);
-    if (valp == 0) {
-        // missed entry
-        return 0;
-    }
-
 		struct uts_namespace *uns = (struct uts_namespace *)task->nsproxy->uts_ns;
-
 		bpf_probe_read(&data.container_id, sizeof(data.container_id), (void *)uns->name.nodename);
 
-    bpf_probe_read(&data.comm, sizeof(data.comm), valp->comm);
-    bpf_probe_read(&data.fname, sizeof(data.fname), (void *)valp->fname);
-    data.pid = valp->pid;
+    bpf_get_current_comm(&data.comm, sizeof(data.comm));
+		bpf_probe_read(&data.fname, sizeof(data.fname), (void *)filename);
+
+		data.pid = bpf_get_current_pid_tgid() >> 32;
     data.uid = bpf_get_current_uid_gid();
-    data.flags = valp->flags; // EXTENDED_STRUCT_MEMBER
-    data.ret = PT_REGS_RC(ctx);
-    events.perf_submit(ctx, &data, sizeof(data));
+    data.flags = flags; // EXTENDED_STRUCT_MEMBER
+
+    infotmp.update(&data.pid, &data);
+    return 0;
+}
+
+int trace_return(struct pt_regs *ctx)
+{
+    struct data_t data = {};
+		struct task_struct *task;
+		u32 pid = bpf_get_current_pid_tgid() >> 32;
+
+		task = (struct task_struct *)bpf_get_current_task();
+		struct pid_namespace *pns = (struct pid_namespace *)task->nsproxy->pid_ns_for_children;
+
+		// 0xEFFFFFFCU is initial host namespace id
+		if (pns->ns.inum == 0xEFFFFFFCU) {
+			return 0;
+		}
+
+		struct data_t *ptr = infotmp.lookup(&pid);
+
+		if (ptr == 0) {
+			return 0;
+		}
+
+		data = *ptr;
+		data.ret = PT_REGS_RC(ctx);
+
+    open_events.perf_submit(ctx, &data, sizeof(data));
     infotmp.delete(&pid);
     return 0;
 }
@@ -114,7 +98,10 @@ int trace_return(struct pt_regs *ctx)
 var TaskCommLen = 16
 
 // NameMax is NAME_MAX
-var NameMax = 255
+// The definition of NAME_MAX is 255,
+// but the size limit of Hash Map is 512.
+// To exceed this, the value is reduced.
+var NameMax = 70
 
 // openEvent is saved a open event
 type openEvent struct {
@@ -127,7 +114,7 @@ type openEvent struct {
 	// Comm is command name
 	Comm [16]byte
 	// Fname is file name
-	Fname [255]byte
+	Fname [70]byte
 	// ContainerID is container id
 	// This is the same ID as the UTS namespace of the process.
 	ContainerID [9]byte
@@ -180,7 +167,7 @@ func (t *openTracer) Load() error {
 		return err
 	}
 
-	table := bpf.NewTable(t.module.TableId("events"), t.module)
+	table := bpf.NewTable(t.module.TableId("open_events"), t.module)
 	t.perfMap, err = bpf.InitPerfMap(table, t.channel)
 
 	if err != nil {

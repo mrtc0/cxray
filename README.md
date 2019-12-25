@@ -1,7 +1,7 @@
 # cxray
 
-cxray is a BPF tool for containers that support to secure operation of containers.  
-For example, you can tracing for opend file and process running in containers on your Kubernetes cluster.
+cxray is a tool for integrating with other security tools by whitelisting events in containers.  
+cxrat can profile events in the container by tracing processes and open files in a container.
 
 # Background
 
@@ -16,7 +16,9 @@ According to [NIST.SP.800-19](https://nvlpubs.nist.gov/nistpubs/SpecialPublicati
  * Traffic sent to unexpected network destinations, and
  * Malware storage or execution.
 
-cxray was created to profile these events.
+cxray was created to profile these events.  
+You can whitelist container events by running cxray in a development or test environment.
+
 
 # Usage
 
@@ -37,14 +39,15 @@ $ cat execve.json
 {"data":{"container_id":"5af89","event":{"syscall":"execve","data":{"argv":"","comm":"/usr/bin/id","pid":"12605","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:37Z"}
 {"data":{"container_id":"5af89","event":{"syscall":"execve","data":{"argv":"-a","comm":"/bin/uname","pid":"12608","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:39Z"}
 {"data":{"container_id":"5af89","event":{"syscall":"execve","data":{"argv":"/etc/passwd","comm":"/bin/cat","pid":"12609","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:41Z"}
+{"data":{"container_id":"5af89d052","event":{"syscall":"open","data":{"comm":"cat","fname":"/etc/passwd","pid":"14134","ret":"3","uid":"0"}}},"level":"info","msg":"open","time":"2019-12-25T02:02:27Z"}
 ```
 
 # Support
 
- * [x] Invalid or unexpected process execution,
- * [x] Invalid or unexpected system calls,
- * [ ] Changes to protected configuration files and binaries,
- * [ ] Writes to unexpected locations and file types,
- * [ ] Creation of unexpected network listeners,
- * [ ]Traffic sent to unexpected network destinations, and
- * [ ]Malware storage or execution.
+ * [x] Invalid or unexpected process execution
+ * [x] Invalid or unexpected system calls
+ * [x] Changes to protected configuration files and binaries
+ * [ ] Writes to unexpected locations and file types
+ * [ ] Creation of unexpected network listeners
+ * [ ] Traffic sent to unexpected network destinations
+ * [ ] Malware storage or execution
