@@ -23,7 +23,7 @@ You can whitelist container events by running cxray in a development or test env
 # Usage
 
 ```shell
-$ sudo ./cxray > execve.json
+$ sudo ./cxray > log.json
 
 $ docker run --rm -it alpine:latest sh
 / # id
@@ -34,7 +34,7 @@ Linux 5af89d05295b 5.0.0-37-generic #40~18.04.1-Ubuntu SMP Thu Nov 14 12:06:39 U
 root:x:0:0:root:/root:/bin/ash
 ...
 
-$ cat execve.json
+$ cat log.json
 {"data":{"container_id":"5af89","event":{"syscall":"execve","data":{"argv":"","comm":"","pid":"12555","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:36Z"}
 {"data":{"container_id":"5af89","event":{"syscall":"execve","data":{"argv":"","comm":"/usr/bin/id","pid":"12605","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:37Z"}
 {"data":{"container_id":"5af89","event":{"syscall":"execve","data":{"argv":"-a","comm":"/bin/uname","pid":"12608","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:39Z"}
