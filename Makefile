@@ -6,3 +6,6 @@ build:
 
 lint:
 	golint -set_exit_status $$(go list ./...)
+
+test:
+	go test -v ./...
