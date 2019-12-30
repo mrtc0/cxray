@@ -61,9 +61,9 @@ for kernel_version in "${kernel_versions[@]}"; do
     --memory=1024M \
     --environment=GOPATH=/go \
     --environment=GO111MODULE=on \
-    --environment=C_INCLUDE_PATH="${kernel_header_dir}/arch/x86/include:${kernel_header_dir}/arch/x86/include/generated" \
+    --environment=C_INCLUDE_PATH="${kernel_header_dir}/arch/x86/include:${kernel_header_dir}/arch/x86/include/generated:/lib/modules/${kernel_version}-kinvolk-v1/include" \
     --exec=/bin/sh -- -c \
-    'printf "\n\nRUN YOUR TESTS HERE (on kernel $(uname -r))\n\n\n" && 
+    'printf "\n\nKernel Environment (on kernel $(uname -r))\n\n" && 
      cd /go/src/github.com/mrtc0/cxray &&
      mount -t tmpfs tmpfs /tmp &&
      mount -t debugfs debugfs /sys/kernel/debug/ &&
