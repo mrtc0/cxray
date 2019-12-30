@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"strings"
 
 	bpf "github.com/iovisor/gobpf/bcc"
@@ -131,10 +132,10 @@ type tcpV4ConnectTracer struct {
 }
 
 // Init is initialize tcpV4ConnectTracer
-func Init() tracer.Tracer {
+func Init(w io.Writer) tracer.Tracer {
 	return &tcpV4ConnectTracer{
 		channel: make(chan []byte),
-		logger:  logger.New(logger.Format()),
+		logger:  logger.New(logger.Format(), logger.Output(w)),
 	}
 }
 

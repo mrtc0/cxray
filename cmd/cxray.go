@@ -25,9 +25,9 @@ func main() {
 
 		tracer.Init()
 		tracer.Tracers = map[string]tracer.Tracer{
-			"execve":       execve.Init(),
-			"open":         open.Init(),
-			"tcpv4connect": tcpv4connect.Init(),
+			"execve":       execve.Init(os.Stdout),
+			"open":         open.Init(os.Stdout),
+			"tcpv4connect": tcpv4connect.Init(os.Stdout),
 		}
 
 		for _, t := range tracer.Tracers {

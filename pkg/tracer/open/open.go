@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -132,10 +133,10 @@ type openTracer struct {
 }
 
 // Init is create openTracer
-func Init() tracer.Tracer {
+func Init(w io.Writer) tracer.Tracer {
 	return &openTracer{
 		channel: make(chan []byte),
-		logger:  logger.New(logger.Format()),
+		logger:  logger.New(logger.Format(), logger.Output(w)),
 	}
 }
 
