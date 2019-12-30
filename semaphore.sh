@@ -12,7 +12,7 @@
 set -eux
 set -o pipefail
 
-readonly kernel_versions=("4.4.129" "4.9.96" "4.14.37")
+readonly kernel_versions=("5.0.0")
 readonly rkt_version="1.30.0"
 
 if [[ ! -f "./rkt/rkt" ]] ||
