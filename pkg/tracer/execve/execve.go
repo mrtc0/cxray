@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -168,12 +169,12 @@ type execveTracer struct {
 }
 
 // Init is create a execveTracer
-func Init() tracer.Tracer {
+func Init(w io.Writer) tracer.Tracer {
 	return &execveTracer{
 		channel: make(chan []byte),
 		argv:    map[uint32]string{},
 		comm:    map[uint32]string{},
-		logger:  logger.New(logger.Format()),
+		logger:  logger.New(logger.Format(), logger.Output(w)),
 	}
 }
 

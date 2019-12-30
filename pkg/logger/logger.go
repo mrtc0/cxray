@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"os"
+	"io"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -33,7 +33,12 @@ type LogOption func(*log.Logger)
 func Format() LogOption {
 	return func(logger *log.Logger) {
 		logger.SetFormatter(&log.JSONFormatter{})
-		logger.SetOutput(os.Stdout)
+	}
+}
+
+func Output(w io.Writer) LogOption {
+	return func(logger *log.Logger) {
+		logger.SetOutput(w)
 	}
 }
 
