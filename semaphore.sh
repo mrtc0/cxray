@@ -30,7 +30,7 @@ fi
 sudo ./rkt/rkt image fetch --insecure-options=image "coreos.com/rkt/stage1-kvm:${rkt_version}" >/dev/null
 
 for kernel_version in "${kernel_versions[@]}"; do
-    kernel_api_header_dir="/lib/modules/${kernel_version}-kinvolk-v1/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include/arch/x86/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include"
+    kernel_api_header_dir="/lib/modules/${kernel_version}-kinvolk-v1/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include:/usr/src/${kernel_version}/arch/x86/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include/arch/x86/include/generated"
   # The stage1-kvm image to use for the tests
   stage1_name="kinvolk.io/aci/rkt/stage1-kvm:${rkt_version},kernelversion=${kernel_version}"
 
