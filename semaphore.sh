@@ -30,7 +30,6 @@ fi
 sudo ./rkt/rkt image fetch --insecure-options=image "coreos.com/rkt/stage1-kvm:${rkt_version}" >/dev/null
 
 for kernel_version in "${kernel_versions[@]}"; do
-    kernel_api_header_dir="/lib/modules/${kernel_version}-kinvolk-v1/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include/arch/x86/include"
   # The stage1-kvm image to use for the tests
   stage1_name="kinvolk.io/aci/rkt/stage1-kvm:${rkt_version},kernelversion=${kernel_version}"
 
@@ -61,7 +60,6 @@ for kernel_version in "${kernel_versions[@]}"; do
     --memory=1024M \
     --environment=GOPATH=/go \
     --environment=GO111MODULE=on \
-    --environment=C_INCLUDE_PATH="${kernel_api_header_dir}" \
     --environment=BCC_KERNEL_MODULES_SUFFIX="source" \
     --exec=/bin/sh -- -c \
     'printf "\n\nRUN YOUR TESTS HERE (on kernel $(uname -r))\n\n\n" && 
@@ -76,5 +74,7 @@ for kernel_version in "${kernel_versions[@]}"; do
   if [[ $test_status -ne 0 ]]; then
     exit "$test_status"
   fi
+
+  sudo ./rkt/rkt gc --grace-period=0
   echo "Test successful on ${kernel_version}"
 done
