@@ -46,6 +46,7 @@ for kernel_version in "${kernel_versions[@]}"; do
     --environment=GOPATH=/go \
     --environment=C_INCLUDE_PATH="${kernel_api_header_dir}" \
     --environment=BCC_KERNEL_MODULES_SUFFIX="source" \
+    --environment=GO111MODULE=on \
     --exec=/bin/sh -- -c \
     'cd /go/src/github.com/mrtc0/cxray &&
       mount -t tmpfs tmpfs /tmp &&
