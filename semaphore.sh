@@ -30,7 +30,7 @@ fi
 sudo ./rkt/rkt image fetch --insecure-options=image "coreos.com/rkt/stage1-kvm:${rkt_version}" >/dev/null
 
 for kernel_version in "${kernel_versions[@]}"; do
-    kernel_api_header_dir="/lib/modules/${kernel_version}-kinvolk-v1/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include:/usr/src/${kernel_version}/arch/x86/include:/lib/modules/${kernel_version}-kinvolk-v1/source/include/arch/x86/include/generated"
+  kernel_header_dir="/lib/modules/${kernel_version}-kinvolk-v1/source/include"
   # The stage1-kvm image to use for the tests
   stage1_name="kinvolk.io/aci/rkt/stage1-kvm:${rkt_version},kernelversion=${kernel_version}"
 
@@ -61,8 +61,7 @@ for kernel_version in "${kernel_versions[@]}"; do
     --memory=1024M \
     --environment=GOPATH=/go \
     --environment=GO111MODULE=on \
-    --environment=C_INCLUDE_PATH="${kernel_api_header_dir}" \
-    --environment=BCC_KERNEL_MODULES_SUFFIX="source" \
+    --environment=C_INCLUDE_PATH="${kernel_header_dir}/arch/x86/include:${kernel_header_dir}/arch/x86/include/generated" \
     --exec=/bin/sh -- -c \
     'printf "\n\nRUN YOUR TESTS HERE (on kernel $(uname -r))\n\n\n" && 
      cd /go/src/github.com/mrtc0/cxray &&
