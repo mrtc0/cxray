@@ -62,13 +62,14 @@ for kernel_version in "${kernel_versions[@]}"; do
     --environment=GOPATH=/go \
     --environment=GO111MODULE=on \
     --environment=C_INCLUDE_PATH="${kernel_header_dir}/arch/x86/include:${kernel_header_dir}/arch/x86/include/generated:/lib/modules/${kernel_version}-kinvolk-v1/include" \
-    --environment=BCC_KERNEL_MODULES_SUFFIX="source"
+    --environment=BCC_KERNEL_MODULES_SUFFIX="source" \
     --exec=/bin/sh -- -c \
     'printf "\n\nKernel Environment (on kernel $(uname -r))\n\n" && 
      cd /go/src/github.com/mrtc0/cxray &&
      mount -t tmpfs tmpfs /tmp &&
      mount -t debugfs debugfs /sys/kernel/debug/ &&
-     go test -v ./...'
+     make build &&
+     make test'
 
   # Determine exit code from pod status due to rkt#2777
   # https://github.com/coreos/rkt/issues/2777
