@@ -48,7 +48,7 @@ for kernel_version in "${kernel_versions[@]}"; do
 
   # timeout can be used to make sure tests finish in
   # a reasonable amount of time
-  sudo timeout --foreground --kill-after=10 5m \
+  sudo timeout --foreground --kill-after=10 10m \
     ./rkt/rkt \
     run --interactive \
     --uuid-file-save=./rkt-uuid \
