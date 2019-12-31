@@ -18,6 +18,8 @@ func TestLoad(t *testing.T) {
 	if err != nil {
 		t.Error("Failed to load execve tracer")
 	}
+
+	tracer.Close()
 }
 
 func TestWatch(t *testing.T) {

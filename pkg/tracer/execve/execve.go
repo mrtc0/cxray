@@ -280,3 +280,8 @@ func (t *execveTracer) Stop() {
 	t.perfMap.Stop()
 	t.module.Close()
 }
+
+// Close is close module
+func (t *execveTracer) Close() {
+	t.module.Close()
+}

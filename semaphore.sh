@@ -48,7 +48,7 @@ for kernel_version in "${kernel_versions[@]}"; do
 
   # timeout can be used to make sure tests finish in
   # a reasonable amount of time
-  sudo timeout --foreground --kill-after=10 10m \
+  sudo timeout --foreground --kill-after=10 20m \
     ./rkt/rkt \
     run --interactive \
     --uuid-file-save=./rkt-uuid \
@@ -62,6 +62,7 @@ for kernel_version in "${kernel_versions[@]}"; do
     --environment=GOPATH=/go \
     --environment=GO111MODULE=on \
     --environment=C_INCLUDE_PATH="${kernel_header_dir}/arch/x86/include:${kernel_header_dir}/arch/x86/include/generated:/lib/modules/${kernel_version}-kinvolk-v1/include" \
+    --environment=BCC_KERNEL_MODULES_SUFFIX="source"
     --exec=/bin/sh -- -c \
     'printf "\n\nKernel Environment (on kernel $(uname -r))\n\n" && 
      cd /go/src/github.com/mrtc0/cxray &&
