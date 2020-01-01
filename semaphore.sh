@@ -10,9 +10,6 @@ readonly kernel_versions=("4.9.96")
 # the custom stage1-kvm images
 readonly rkt_version="1.30.0"
 
-# Directory where this file is, used in the example below
-readonly dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 # Download rkt if not available yet as Semaphore CI
 # doesn't have rkt at the time of writing
 if [[ ! -f "./rkt/rkt" ]] ||
@@ -72,7 +69,7 @@ for kernel_version in "${kernel_versions[@]}"; do
      cd /go/src/github.com/mrtc0/cxray &&
      mount -t tmpfs tmpfs /tmp &&
      mount -t debugfs debugfs /sys/kernel/debug/ &&
-     make test'
+     go test -v ./...'
 
   # Determine exit code from pod status due to rkt#2777
   # https://github.com/coreos/rkt/issues/2777
