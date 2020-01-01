@@ -37,6 +37,10 @@ for kernel_version in "${kernel_versions[@]}"; do
   # Make sure there's no stale rkt-uuid file
   rm -f ./rkt-uuid
 
+  # https://github.com/rkt/rkt/issues/2928
+  sudo iptables -A FORWARD -d 172.16.28.0/24 -j ACCEPT
+  sudo iptables -A FORWARD -s 172.16.28.0/24 -j ACCEPT
+
   # You most likely want to provide source code to the
   # container in order to run the tests. You can do this
   # with volumes:

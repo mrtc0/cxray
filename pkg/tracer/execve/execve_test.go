@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"regexp"
 	"testing"
+	"time"
 
 	tracer "github.com/mrtc0/cxray/pkg/tracer"
 )
@@ -42,14 +43,16 @@ func TestWatch(t *testing.T) {
 
 	execveTracer.Start()
 
-	cmd := exec.Command("docker", "run", "-h", "test", "--rm", "alpine:latest", "sh", "-c", "'sleep 3; ls -al';")
+	time.Sleep(3 * time.Second)
+
+	cmd := exec.Command("sudo", "unshare", "--uts", "--pid", "--fork", "--", "ls -al")
 	cmd.Start()
 	cmd.Wait()
 
 	execveTracer.Stop()
 
 	output := buf.String()
-	expect := regexp.MustCompile(`^{"data":{"container_id":"test","event":{"syscall":"execve","data":{"argv":"-c 'sleep 3; ls -al';","comm":"\/bin\/sh","pid":"\d+","ret":"0","uid":"0","user":"root"}}}`)
+	expect := regexp.MustCompile(`{"data":{"container_id":".*","event":{"syscall":"execve","data":{"argv":"-al","comm":"\/usr\/local\/sbin\/ls","pid":"\d+","ret":".*","uid":"0","user":"root"}}}`)
 	if !expect.MatchString(output) {
 		t.Errorf("Unexpected output.\nexpect regex: %#v,\n got: %s\n", expect, output)
 	}
