@@ -72,7 +72,6 @@ for kernel_version in "${kernel_versions[@]}"; do
      cd /go/src/github.com/mrtc0/cxray &&
      mount -t tmpfs tmpfs /tmp &&
      mount -t debugfs debugfs /sys/kernel/debug/ &&
-     make build &&
      make test'
 
   # Determine exit code from pod status due to rkt#2777
