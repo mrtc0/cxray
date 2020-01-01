@@ -16,4 +16,3 @@ blocks:
             - 'export PATH=/home/semaphore/go/bin:$PATH'
             - checkout
             - ./semaphore.sh
-            - make build
