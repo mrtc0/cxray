@@ -32,7 +32,7 @@ struct data_t {
 		char comm[TASK_COMM_LEN];
     char fname[70];
 		char container_id [9];
-    u32 flags; // EXTENDED_STRUCT_MEMBER
+    u32 flags;
 };
 
 BPF_HASH(infotmp, u32, struct data_t);
@@ -59,7 +59,7 @@ int trace_entry(struct pt_regs *ctx, int dfd, const char __user *filename, int f
 
 		data.pid = bpf_get_current_pid_tgid() >> 32;
     data.uid = bpf_get_current_uid_gid();
-    data.flags = flags; // EXTENDED_STRUCT_MEMBER
+    data.flags = flags;
 
     infotmp.update(&data.pid, &data);
     return 0;
@@ -210,6 +210,7 @@ func (t *openTracer) Watch() error {
 				"uid":   fmt.Sprint(event.UID),
 				"comm":  comm,
 				"fname": fname,
+				"flags": fmt.Sprint(event.Flags),
 			},
 		},
 	}
