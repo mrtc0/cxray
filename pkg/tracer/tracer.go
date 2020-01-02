@@ -10,6 +10,7 @@ type Tracer interface {
 	Watch() error
 	Start()
 	Stop()
+	Close()
 }
 
 // Tracers is registerd some tracers

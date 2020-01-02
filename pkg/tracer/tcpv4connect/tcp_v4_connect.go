@@ -219,3 +219,8 @@ func (t *tcpV4ConnectTracer) Stop() {
 	t.perfMap.Stop()
 	t.module.Close()
 }
+
+// Close is close module
+func (t *tcpV4ConnectTracer) Close() {
+	t.module.Close()
+}

@@ -36,9 +36,9 @@ struct data_t {
 	u32 uid;
   char comm[TASK_COMM_LEN];
 	char argv[ARGV_SIZE];
-	enum event type;
-	long retval;
   char container_id [9];
+	enum event type;
+	int retval;
 };
 
 BPF_PERF_OUTPUT(events);
@@ -125,7 +125,7 @@ int ret_syscall__execve(struct pt_regs *ctx)
 )
 
 // EventType is EventArg or EventRet
-type EventType uint32
+type EventType int32
 
 const (
 	// EventArg is EVENT_ARG in bpf program
@@ -146,15 +146,15 @@ type execveEvent struct {
 	Comm [16]byte
 	// Argv is argument for command
 	Argv [ArgvSize]byte
-	// Type is kprobe or kretprobe
-	Type EventType
-	// RetVal is return value
-	RetVal int64
 	// ContainerID is container id
 	// This is the same ID as the UTS namespace of the process.
 	ContainerID [9]byte
-	// Pad is Padding
-	Pad [3]byte
+	// Type is kprobe or kretprobe
+	Type EventType
+	// _ is Padding
+	_ [3]byte
+	// RetVal is return value
+	RetVal int32
 }
 
 // execveTracer is reciver
@@ -243,7 +243,7 @@ func (t *execveTracer) Watch() error {
 		}
 	}
 
-	if event.Type == 1 {
+	if event.Type > 0 {
 		command := strings.Split(t.argv[event.PID], " ")
 		comm := command[0]
 		argv := strings.Join(command[1:], " ")
@@ -278,5 +278,10 @@ func (t *execveTracer) Start() {
 // Stop is stop this program and close module
 func (t *execveTracer) Stop() {
 	t.perfMap.Stop()
+	t.module.Close()
+}
+
+// Close is close module
+func (t *execveTracer) Close() {
 	t.module.Close()
 }
