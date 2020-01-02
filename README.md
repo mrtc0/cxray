@@ -1,5 +1,7 @@
 # cxray
 
+[![Build Status](https://semaphoreci.com/api/v1/mrtc0/cxray/branches/master/badge.svg)](https://semaphoreci.com/mrtc0/cxray)
+
 cxray is a tool for integrating with other security tools by whitelisting events in containers.  
 cxrat can profile events in the container by tracing processes and open files in a container.
 
