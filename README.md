@@ -49,10 +49,7 @@ $ cat log.json
 
 # Support
 
- * [x] Invalid or unexpected process execution
- * [x] Invalid or unexpected system calls
- * [x] Changes to protected configuration files and binaries
- * [ ] Writes to unexpected locations and file types
- * [ ] Creation of unexpected network listeners
- * [x] Traffic sent to unexpected network destinations
- * [ ] Malware storage or execution
+ * [x] Process Execution
+ * [x] Access to files and binaries
+ * [x] Creation of network listeners
+ * [x] Traffic sent to network destinations

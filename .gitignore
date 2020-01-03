@@ -2,3 +2,4 @@
 .vagrant/
 build/
 Vagrantfile
+tmp/

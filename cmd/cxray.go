@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -9,6 +8,7 @@ import (
 
 	tracer "github.com/mrtc0/cxray/pkg/tracer"
 	"github.com/mrtc0/cxray/pkg/tracer/execve"
+	"github.com/mrtc0/cxray/pkg/tracer/listen"
 	"github.com/mrtc0/cxray/pkg/tracer/open"
 	"github.com/mrtc0/cxray/pkg/tracer/tcpv4connect"
 	"gopkg.in/urfave/cli.v1"
@@ -28,19 +28,22 @@ func main() {
 			"execve":       execve.Init(os.Stdout),
 			"open":         open.Init(os.Stdout),
 			"tcpv4connect": tcpv4connect.Init(os.Stdout),
+			"listen":       listen.Init(os.Stdout),
 		}
 
 		for _, t := range tracer.Tracers {
 			err := t.Load()
 			if err != nil {
 				log.Fatal(err)
+				t.Stop()
 			}
 
 			go func(t tracer.Tracer) {
 				for {
 					err := t.Watch()
 					if err != nil {
-						fmt.Println(err)
+						log.Fatal(err)
+						t.Stop()
 					}
 				}
 			}(t)
