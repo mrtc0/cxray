@@ -3,9 +3,11 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"net"
 	"os/user"
 	"strconv"
+	"strings"
 )
 
 // TrimNullByte is trim null byte (0x00) from []byte
@@ -41,4 +43,15 @@ func Uint2Port(n uint16) string {
 	buf := bytes.NewBuffer(b)
 	binary.Read(buf, binary.BigEndian, &port)
 	return strconv.Itoa(int(port))
+}
+
+func ByteArrayToIPv4(bytes [4]byte) string {
+	ip := [4]string{}
+	c := 3
+
+	for _, b := range bytes {
+		ip[c] = fmt.Sprintf("%d", b)
+		c--
+	}
+	return strings.Join(ip[:], ".")
 }
