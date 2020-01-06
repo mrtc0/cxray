@@ -4,7 +4,7 @@ set -eu
 set -o pipefail
 
 # The kernel versions we want to run the tests on
-readonly kernel_versions=("4.9.96")
+readonly kernel_versions=("4.14.37", "4.16.0", "4.4.129", "4.9.96")
 
 # The rkt version which is set as a dependency for
 # the custom stage1-kvm images
