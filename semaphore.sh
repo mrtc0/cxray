@@ -26,6 +26,10 @@ fi
 # https://github.com/coreos/rkt/issues/2241
 sudo ./rkt/rkt image fetch --insecure-options=image "coreos.com/rkt/stage1-kvm:${rkt_version}" >/dev/null
 
+# https://github.com/rkt/rkt/issues/2928
+sudo iptables -A FORWARD -d 172.16.28.0/24 -j ACCEPT
+sudo iptables -A FORWARD -s 172.16.28.0/24 -j ACCEPT
+
 for kernel_version in "${kernel_versions[@]}"; do
   kernel_header_dir="/lib/modules/${kernel_version}-kinvolk-v1/source/include"
   # The stage1-kvm image to use for the tests
@@ -33,10 +37,6 @@ for kernel_version in "${kernel_versions[@]}"; do
 
   # Make sure there's no stale rkt-uuid file
   rm -f ./rkt-uuid
-
-  # https://github.com/rkt/rkt/issues/2928
-  sudo iptables -A FORWARD -d 172.16.28.0/24 -j ACCEPT
-  sudo iptables -A FORWARD -s 172.16.28.0/24 -j ACCEPT
 
   # You most likely want to provide source code to the
   # container in order to run the tests. You can do this
