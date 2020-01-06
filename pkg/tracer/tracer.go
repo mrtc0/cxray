@@ -1,5 +1,7 @@
 package tracer
 
+import "github.com/mrtc0/cxray/pkg/logger"
+
 // Tracer interface
 // Load() is load a BPF tracer program
 // Watch() is watch event (e.g. perfmap), log to a terminal
@@ -7,7 +9,7 @@ package tracer
 // Stop() is stop BPF tracer program
 type Tracer interface {
 	Load() error
-	Watch() error
+	Watch() (*logger.EventLog, error)
 	Start()
 	Stop()
 	Close()

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -106,13 +105,11 @@ type inetListenTracer struct {
 	module  *bpf.Module
 	perfMap *bpf.PerfMap
 	channel chan []byte
-	logger  *logger.Logger
 }
 
-func Init(w io.Writer) tracer.Tracer {
+func Init() tracer.Tracer {
 	return &inetListenTracer{
 		channel: make(chan []byte),
-		logger:  logger.New(logger.Format(), logger.Output(w)),
 	}
 }
 
@@ -143,12 +140,14 @@ func (t *inetListenTracer) Load() error {
 	return nil
 }
 
-func (t *inetListenTracer) Watch() error {
+func (t *inetListenTracer) Watch() (*logger.EventLog, error) {
 	var event inetListenEvent
+	var eventLog logger.EventLog
+
 	data := <-t.channel
 
 	if err := binary.Read(bytes.NewBuffer(data), binary.LittleEndian, &event); err != nil {
-		return err
+		return nil, err
 	}
 
 	index := bytes.IndexByte(event.Comm[:], 0)
@@ -170,7 +169,7 @@ func (t *inetListenTracer) Watch() error {
 		protocol = "unknown"
 	}
 
-	e := logger.EventLog{
+	eventLog = logger.EventLog{
 		ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
 		Event: logger.SyscallEventLog{
 			Syscall: "inet_listen",
@@ -185,9 +184,7 @@ func (t *inetListenTracer) Watch() error {
 		},
 	}
 
-	t.logger.Info("inet_listen", e)
-
-	return nil
+	return &eventLog, nil
 }
 
 // Start is start this program

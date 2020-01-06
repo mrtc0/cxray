@@ -58,3 +58,7 @@ func (logger *Logger) Info(msg string, data EventLog) {
 		"data": data,
 	}).Info(msg)
 }
+
+func (logger *Logger) Fatal(msg error) {
+	logger.Logger.Fatal(msg)
+}

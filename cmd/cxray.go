@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/mrtc0/cxray/pkg/logger"
 	tracer "github.com/mrtc0/cxray/pkg/tracer"
 	"github.com/mrtc0/cxray/pkg/tracer/execve"
 	"github.com/mrtc0/cxray/pkg/tracer/listen"
@@ -16,8 +16,10 @@ import (
 
 func main() {
 	app := cli.NewApp()
+	l := logger.New(logger.Format(), logger.Output(os.Stdout))
 
 	app.Action = func(c *cli.Context) error {
+		l := logger.New(logger.Format(), logger.Output(os.Stdout))
 		sig := make(chan os.Signal, 1)
 
 		signal.Notify(sig, os.Interrupt)
@@ -25,26 +27,33 @@ func main() {
 
 		tracer.Init()
 		tracer.Tracers = map[string]tracer.Tracer{
-			"execve":       execve.Init(os.Stdout),
-			"open":         open.Init(os.Stdout),
-			"tcpv4connect": tcpv4connect.Init(os.Stdout),
-			"listen":       listen.Init(os.Stdout),
+			"execve":       execve.Init(),
+			"open":         open.Init(),
+			"tcpv4connect": tcpv4connect.Init(),
+			"listen":       listen.Init(),
 		}
 
 		for _, t := range tracer.Tracers {
 			err := t.Load()
 			if err != nil {
-				log.Fatal(err)
 				t.Stop()
+				l.Fatal(err)
 			}
 
 			go func(t tracer.Tracer) {
 				for {
-					err := t.Watch()
-					if err != nil {
-						log.Fatal(err)
-						t.Stop()
+					event, err := t.Watch()
+
+					if event == nil {
+						continue
 					}
+
+					if err != nil {
+						t.Stop()
+						l.Fatal(err)
+					}
+
+					l.Info("", *event)
 				}
 			}(t)
 
@@ -57,8 +66,9 @@ func main() {
 		}
 		return nil
 	}
+
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		l.Fatal(err)
 	}
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"strings"
 
 	bpf "github.com/iovisor/gobpf/bcc"
@@ -128,14 +127,12 @@ type tcpV4ConnectTracer struct {
 	module  *bpf.Module
 	perfMap *bpf.PerfMap
 	channel chan []byte
-	logger  *logger.Logger
 }
 
 // Init is initialize tcpV4ConnectTracer
-func Init(w io.Writer) tracer.Tracer {
+func Init() tracer.Tracer {
 	return &tcpV4ConnectTracer{
 		channel: make(chan []byte),
-		logger:  logger.New(logger.Format(), logger.Output(w)),
 	}
 }
 
@@ -174,12 +171,14 @@ func (t *tcpV4ConnectTracer) Load() error {
 }
 
 // Wacth is watch and logging to bpf event
-func (t *tcpV4ConnectTracer) Watch() error {
+func (t *tcpV4ConnectTracer) Watch() (*logger.EventLog, error) {
 	var event tcpV4ConnectEvent
+	var eventLog logger.EventLog
+
 	data := <-t.channel
 
 	if err := binary.Read(bytes.NewBuffer(data), binary.LittleEndian, &event); err != nil {
-		return err
+		return nil, err
 	}
 
 	index := bytes.IndexByte(event.Comm[:], 0)
@@ -188,7 +187,7 @@ func (t *tcpV4ConnectTracer) Watch() error {
 	}
 	comm := strings.TrimSpace(string(event.Comm[:index]))
 
-	e := logger.EventLog{
+	eventLog = logger.EventLog{
 		ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
 		Event: logger.SyscallEventLog{
 			Syscall: "tcp_v4_connect",
@@ -204,9 +203,7 @@ func (t *tcpV4ConnectTracer) Watch() error {
 		},
 	}
 
-	t.logger.Info("tcp_v4_connect", e)
-
-	return nil
+	return &eventLog, nil
 }
 
 // Start is start this program
