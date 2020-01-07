@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -165,16 +164,14 @@ type execveTracer struct {
 	channel chan []byte
 	argv    map[uint32]string
 	comm    map[uint32]string
-	logger  *logger.Logger
 }
 
 // Init is create a execveTracer
-func Init(w io.Writer) tracer.Tracer {
+func Init() tracer.Tracer {
 	return &execveTracer{
 		channel: make(chan []byte),
 		argv:    map[uint32]string{},
 		comm:    map[uint32]string{},
-		logger:  logger.New(logger.Format(), logger.Output(w)),
 	}
 }
 
@@ -221,12 +218,14 @@ func (t *execveTracer) Load() error {
 }
 
 // Watch is watch and logging to bpf event
-func (t *execveTracer) Watch() error {
+func (t *execveTracer) Watch() (*logger.EventLog, error) {
 	var event execveEvent
+	var eventLog logger.EventLog
+
 	data := <-t.channel
 
 	if err := binary.Read(bytes.NewBuffer(data), binary.LittleEndian, &event); err != nil {
-		return err
+		return nil, err
 	}
 
 	index := bytes.IndexByte(event.Argv[:], 0)
@@ -250,7 +249,7 @@ func (t *execveTracer) Watch() error {
 
 		username := utils.GetUsernameByUID(fmt.Sprint(event.UID))
 
-		e := logger.EventLog{
+		eventLog = logger.EventLog{
 			ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
 			Event: logger.SyscallEventLog{
 				Syscall: "execve",
@@ -264,10 +263,11 @@ func (t *execveTracer) Watch() error {
 				},
 			},
 		}
-		t.logger.Info("execve", e)
+
+		return &eventLog, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 // Start is start this program

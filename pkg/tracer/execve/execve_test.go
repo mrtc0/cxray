@@ -1,19 +1,18 @@
 package execve
 
 import (
-	"bytes"
+	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
 	"regexp"
 	"testing"
-	"time"
 
+	logger "github.com/mrtc0/cxray/pkg/logger"
 	tracer "github.com/mrtc0/cxray/pkg/tracer"
 )
 
 func TestLoad(t *testing.T) {
-	tracer := Init(os.Stdout)
+	tracer := Init()
 
 	err := tracer.Load()
 	if err != nil {
@@ -24,26 +23,31 @@ func TestLoad(t *testing.T) {
 }
 
 func TestWatch(t *testing.T) {
-	buf := &bytes.Buffer{}
-	execveTracer := Init(buf)
+	execveTracer := Init()
 
 	err := execveTracer.Load()
 	if err != nil {
 		fmt.Errorf("Failed to load execve tracer")
 	}
 
+	events := make(chan logger.EventLog, 20)
+
 	go func(execvetracer tracer.Tracer) {
 		for {
-			err := execvetracer.Watch()
+			event, err := execvetracer.Watch()
+			if event == nil {
+				continue
+			}
+
 			if err != nil {
 				fmt.Errorf("Failed to watch execve tracer")
 			}
+
+			events <- *event
 		}
 	}(execveTracer)
 
 	execveTracer.Start()
-
-	time.Sleep(3 * time.Second)
 
 	cmd := exec.Command("sudo", "unshare", "--uts", "--pid", "--fork", "--", "ls -al")
 	cmd.Start()
@@ -51,8 +55,20 @@ func TestWatch(t *testing.T) {
 
 	execveTracer.Stop()
 
-	output := buf.String()
-	expect := regexp.MustCompile(`{"data":{"container_id":".*","event":{"syscall":"execve","data":{"argv":"-al","comm":"\/usr\/local\/sbin\/ls","pid":"\d+","ret":".*","uid":"0","user":"root"}}}`)
+	close(events)
+
+	s := make([]logger.EventLog, len(events))
+	for i := range events {
+		s = append(s, i)
+	}
+
+	b, err := json.Marshal(s)
+	if err != nil {
+		t.Errorf("Failed Marshal events struct: %s", err)
+	}
+
+	output := string(b)
+	expect := regexp.MustCompile(`{"container_id":".*","event":{"syscall":"execve","data":{"argv":"-al","comm":"\/usr\/local\/sbin\/ls","pid":"\d+","ret":".*","uid":"0","user":"root"}}`)
 	if !expect.MatchString(output) {
 		t.Errorf("Unexpected output.\nexpect regex: %#v,\n got: %s\n", expect, output)
 	}
