@@ -8,15 +8,15 @@ import (
 
 // EventLog is a common log struct
 type EventLog struct {
-	ContainerID string          `json:"container_id"`
-	Event       SyscallEventLog `json:"event"`
+	ContainerID string `json:"container_id"`
+	Event       Event  `json:"event"`
 }
 
-// SyscallEventLog is a syscall event log struct
+// Event is a event log struct
 // Data filed is map[string]string because the field varies by syscall
-type SyscallEventLog struct {
-	Syscall string            `json:"syscall"`
-	Data    map[string]string `json:"data"`
+type Event struct {
+	Name string            `json:"name"`
+	Data map[string]string `json:"data"`
 }
 
 // Logger is a common logger struct

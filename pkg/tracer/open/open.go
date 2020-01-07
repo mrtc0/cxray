@@ -201,8 +201,8 @@ func (t *openTracer) Watch() (*logger.EventLog, error) {
 
 	eventLog = logger.EventLog{
 		ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
-		Event: logger.SyscallEventLog{
-			Syscall: "open",
+		Event: logger.Event{
+			Name: "open",
 			Data: map[string]string{
 				"ret":   fmt.Sprint(event.RetVal),
 				"pid":   fmt.Sprint(event.PID),

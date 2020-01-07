@@ -41,12 +41,12 @@ root:x:0:0:root:/root:/bin/ash
 ...
 
 $ cat log.json
-{"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"","comm":"","pid":"12555","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:36Z"}
-{"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"","comm":"/usr/bin/id","pid":"12605","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:37Z"}
-{"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"-a","comm":"/bin/uname","pid":"12608","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:39Z"}
-{"data":{"container_id":"5af89d052","event":{"syscall":"execve","data":{"argv":"/etc/passwd","comm":"/bin/cat","pid":"12609","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:41Z"}
-{"data":{"container_id":"5af89d052","event":{"syscall":"open","data":{"comm":"cat","fname":"/etc/passwd","pid":"14134","ret":"3","uid":"0"}}},"level":"info","msg":"open","time":"2019-12-25T02:02:27Z"}
-{"data":{"container_id":"5af89d052","event":{"syscall":"tcp_v4_connect","data":{"comm":"curl","daddr":"93.184.216.34","dport":"443","pid":"17408","ret":"0","saddr":"172.17.0.2","uid":"0"}}},"level":"info","msg":"tcp_v4_connect","time":"2019-12-25T16:12:01Z"}
+{"data":{"container_id":"5af89d052","event":{"name":"execve","data":{"argv":"","comm":"","pid":"12555","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:36Z"}
+{"data":{"container_id":"5af89d052","event":{"name":"execve","data":{"argv":"","comm":"/usr/bin/id","pid":"12605","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:37Z"}
+{"data":{"container_id":"5af89d052","event":{"name":"execve","data":{"argv":"-a","comm":"/bin/uname","pid":"12608","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:39Z"}
+{"data":{"container_id":"5af89d052","event":{"name":"execve","data":{"argv":"/etc/passwd","comm":"/bin/cat","pid":"12609","ret":"0","uid":"0","user":"root"}}},"level":"info","msg":"execve","time":"2019-12-24T12:45:41Z"}
+{"data":{"container_id":"5af89d052","event":{"name":"open","data":{"comm":"cat","fname":"/etc/passwd","pid":"14134","ret":"3","uid":"0"}}},"level":"info","msg":"open","time":"2019-12-25T02:02:27Z"}
+{"data":{"container_id":"5af89d052","event":{"name":"tcp_v4_connect","data":{"comm":"curl","daddr":"93.184.216.34","dport":"443","pid":"17408","ret":"0","saddr":"172.17.0.2","uid":"0"}}},"level":"info","msg":"tcp_v4_connect","time":"2019-12-25T16:12:01Z"}
 ```
 
 ## Executing Processes (execve)
@@ -56,7 +56,7 @@ $ cat log.json
   "data": {
     "container_id": "b85bd4425",
     "event": {
-      "syscall": "execve",
+      "name": "execve",
       "data": {
         "argv": "-a",
         "comm": "/bin/uname",
@@ -80,7 +80,7 @@ $ cat log.json
   "data": {
     "container_id": "b85bd4425",
     "event": {
-      "syscall": "open",
+      "name": "open",
       "data": {
         "comm": "cat",
         "fname": "/etc/shadow",
@@ -103,7 +103,7 @@ $ cat log.json
   "data": {
     "container_id": "b85bd4425",
     "event": {
-      "syscall": "tcp_v4_connect",
+      "name": "tcp_v4_connect",
       "data": {
         "comm": "wget",
         "daddr": "93.184.216.34",
@@ -128,7 +128,7 @@ $ cat log.json
   "data": {
     "container_id": "",
     "event": {
-      "syscall": "inet_listen",
+      "name": "inet_listen",
       "data": {
         "comm": "nc",
         "listen_addr": "0.0.0.0",

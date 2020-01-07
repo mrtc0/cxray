@@ -189,8 +189,8 @@ func (t *tcpV4ConnectTracer) Watch() (*logger.EventLog, error) {
 
 	eventLog = logger.EventLog{
 		ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
-		Event: logger.SyscallEventLog{
-			Syscall: "tcp_v4_connect",
+		Event: logger.Event{
+			Name: "tcp_v4_connect",
 			Data: map[string]string{
 				"ret":   fmt.Sprint(event.Ret),
 				"pid":   fmt.Sprint(event.PID),
