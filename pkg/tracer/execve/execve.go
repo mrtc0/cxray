@@ -251,8 +251,8 @@ func (t *execveTracer) Watch() (*logger.EventLog, error) {
 
 		eventLog = logger.EventLog{
 			ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
-			Event: logger.SyscallEventLog{
-				Syscall: "execve",
+			Event: logger.Event{
+				Name: "execve",
 				Data: map[string]string{
 					"ret":  fmt.Sprint(event.RetVal),
 					"pid":  fmt.Sprint(event.PID),

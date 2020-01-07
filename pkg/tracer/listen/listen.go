@@ -171,8 +171,8 @@ func (t *inetListenTracer) Watch() (*logger.EventLog, error) {
 
 	eventLog = logger.EventLog{
 		ContainerID: string(utils.TrimNullByte(event.ContainerID[:])),
-		Event: logger.SyscallEventLog{
-			Syscall: "inet_listen",
+		Event: logger.Event{
+			Name: "inet_listen",
 			Data: map[string]string{
 				"pid":         fmt.Sprint(event.PID),
 				"uid":         fmt.Sprint(event.UID),

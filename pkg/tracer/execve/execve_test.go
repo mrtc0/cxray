@@ -68,7 +68,7 @@ func TestWatch(t *testing.T) {
 	}
 
 	output := string(b)
-	expect := regexp.MustCompile(`{"container_id":".*","event":{"syscall":"execve","data":{"argv":"-al","comm":"\/usr\/local\/sbin\/ls","pid":"\d+","ret":".*","uid":"0","user":"root"}}`)
+	expect := regexp.MustCompile(`{"container_id":".*","event":{"name":"execve","data":{"argv":"-al","comm":"\/usr\/local\/sbin\/ls","pid":"\d+","ret":".*","uid":"0","user":"root"}}`)
 	if !expect.MatchString(output) {
 		t.Errorf("Unexpected output.\nexpect regex: %#v,\n got: %s\n", expect, output)
 	}
